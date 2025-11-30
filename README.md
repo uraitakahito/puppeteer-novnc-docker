@@ -28,3 +28,23 @@ supervisorctl -c /etc/supervisor/conf.d/app.conf restart chromium
 - Chromium: `/tmp/chromium-stdout.log`, `/tmp/chromium-stderr.log`
 - Socat: `/tmp/socat-stdout.log`, `/tmp/socat-stderr.log`
 - Supervisord: `/tmp/supervisord.log`
+
+## Example Usage(Not implemented)
+
+### Running from the terminal
+
+Set the `DISPLAY` environment variable to use the VNC server:
+
+```sh
+DISPLAY=:1 node example.mjs
+```
+
+You can watch the browser in action via noVNC at http://localhost:6080/
+
+### Using xvfb
+
+Use `xvfb-run` to run headful mode without a display (useful for CI/CD):
+
+```sh
+xvfb-run --auto-servernum npx node example.mjs
+```
