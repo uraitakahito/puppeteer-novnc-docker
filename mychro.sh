@@ -15,4 +15,5 @@ chromium --remote-debugging-port=9223 \
          --disable-gpu \
          --no-sandbox \
          --disable-setuid-sandbox \
+         --password-store=basic \
          --user-data-dir=/tmp/chrome-profile
