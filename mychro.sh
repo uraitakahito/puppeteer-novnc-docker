@@ -17,4 +17,5 @@ chromium --remote-debugging-port=9223 \
          --disable-setuid-sandbox \
          --password-store=basic \
          --start-maximized \
+         --disk-cache-size=2147483648 \
          --user-data-dir=/tmp/chrome-profile
