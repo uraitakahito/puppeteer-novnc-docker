@@ -1,50 +1,15 @@
-## Setup
+# Puppeteer noVNC Docker
 
-**Detailed environment setup instructions are described at the beginning of the `Dockerfile`.**
+A Docker environment for running Chromium with Chrome DevTools Protocol (CDP) support. Provides both production and development targets using multi-stage builds.
 
-## Chromium Auto-Start
+## Overview
 
-When the container starts, Chromium automatically launches and is viewable via noVNC.
+This project provides a Docker environment for running Chromium with Chrome DevTools Protocol (CDP) support.
 
-- **noVNC URL:** http://localhost:6080
-- **Remote Debugging Port:** 9222 (forwarded from 9223)
+**Two build targets are available:**
+- **Production**: Headless Chromium with minimal footprint (no Node.js, no VNC)
+- **Development**: Full-featured environment with VNC, Node.js, and development tools
 
-### Process Management
+## Setup Instructions
 
-Chromium and socat are managed by supervisord. To check status:
-
-```bash
-supervisorctl -c /etc/supervisor/conf.d/app.conf status
-```
-
-To restart Chromium:
-
-```bash
-supervisorctl -c /etc/supervisor/conf.d/app.conf restart chromium
-```
-
-### Logs
-
-- Chromium: `/tmp/chromium-stdout.log`, `/tmp/chromium-stderr.log`
-- Socat: `/tmp/socat-stdout.log`, `/tmp/socat-stderr.log`
-- Supervisord: `/tmp/supervisord.log`
-
-## Example Usage(Not implemented)
-
-### Running from the terminal
-
-Set the `DISPLAY` environment variable to use the VNC server:
-
-```sh
-DISPLAY=:1 node example.mjs
-```
-
-You can watch the browser in action via noVNC at http://localhost:6080/
-
-### Using xvfb
-
-Use `xvfb-run` to run headful mode without a display (useful for CI/CD):
-
-```sh
-xvfb-run --auto-servernum npx node example.mjs
-```
+**All build commands, run commands, and detailed environment setup instructions are documented at the beginning of the [`Dockerfile`](Dockerfile).**
