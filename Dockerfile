@@ -1,5 +1,5 @@
 #
-# Dockerfile for building a Puppeteer environment (Multi-stage build)
+# Dockerfile for building a Chromium server environment (Multi-stage build)
 #
 # ## Features of this Dockerfile
 #
@@ -9,10 +9,10 @@
 # - Headless Chromium execution (no display server required)
 # - Minimal footprint without Node.js or development tools
 # - Chrome DevTools Protocol access on port 9222 via socat
-# - Use with external Puppeteer client connecting via CDP
+# - Use with external CDP client connecting remotely
 #
 # ### Development (--target development)
-# - You can verify Puppeteer operations via VNC using a browser
+# - You can verify Chromium operations via VNC using a browser
 # - Node.js and Claude Code are pre-installed
 # - Includes dotfiles and extra utilities
 # - Assumes host OS is Mac
@@ -33,19 +33,9 @@
 #
 # ### Build the Docker image
 #
-# Production:
-#
-#   PROJECT=$(basename `pwd`) && docker image build --target production -t $PROJECT-image:prod . --build-arg user_id=`id -u` --build-arg group_id=`id -g`
-#
-# Development:
-#
 #   PROJECT=$(basename `pwd`) && docker image build --target development -t $PROJECT-image:dev . --build-arg user_id=`id -u` --build-arg group_id=`id -g` --build-arg TZ=Asia/Tokyo
 #
 # ### Run the container
-#
-# Production:
-#
-#   docker container run -d --rm --init -p 9222:9222 --name puppeteer-prod $PROJECT-image:prod
 #
 # Development:
 #
@@ -57,12 +47,12 @@
 #
 # (First time only) Create the network:
 #
-#   docker network create puppeteer-network
+#   docker network create chromium-network
 #
 # When starting two Docker containers:
 #
-#   docker container run -d --rm --init -v $SSH_AUTH_SOCK:/ssh-agent -p 5901:5901 -p 6080:6080 -p 9222:9222 -e NODE_ENV=development -e SSH_AUTH_SOCK=/ssh-agent --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume --network puppeteer-network --name puppeteer-1 $PROJECT-image:dev
-#   docker container run -d --rm --init -v $SSH_AUTH_SOCK:/ssh-agent -p 5902:5901 -p 6081:6080 -p 9223:9222 -e NODE_ENV=development -e SSH_AUTH_SOCK=/ssh-agent --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume --network puppeteer-network --name puppeteer-2 $PROJECT-image:dev
+#   docker container run -d --rm --init -v $SSH_AUTH_SOCK:/ssh-agent -p 5901:5901 -p 6080:6080 -p 9222:9222 -e NODE_ENV=development -e SSH_AUTH_SOCK=/ssh-agent --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume --network chromium-network --name chromium-server-1 $PROJECT-image:dev
+#   docker container run -d --rm --init -v $SSH_AUTH_SOCK:/ssh-agent -p 5902:5901 -p 6081:6080 -p 9223:9222 -e NODE_ENV=development -e SSH_AUTH_SOCK=/ssh-agent --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume --network chromium-network --name chromium-server-2 $PROJECT-image:dev
 #
 # Log in to Docker:
 #
@@ -244,7 +234,7 @@ RUN INSTALLYARNUSINGAPT=false \
     VERSION=${node_version} \
       /usr/src/features/src/node/install.sh
 
-# Puppeteer environment variables (development only, for running Puppeteer scripts)
+# Puppeteer environment variables (development only, for running automation scripts)
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
@@ -316,7 +306,7 @@ RUN bash -c "source $NVM_DIR/nvm.sh && \
 # it automatically detects exposed ports and sets up port forwarding from the Mac's
 # localhost to the container. This is called "Auto Forward Ports" feature.
 #
-# In projects where a server runs on the Mac host (e.g., Puppeteer server) and
+# In projects where a server runs on the Mac host (e.g., CDP server) and
 # the container connects to it via `--add-host=<hostname>:host-gateway`, exposing
 # the same port here causes a conflict.
 #

@@ -1,4 +1,4 @@
-# Puppeteer noVNC Docker
+# Chromium Server Docker
 
 A Docker environment for running Chromium with Chrome DevTools Protocol (CDP) support. Provides both production and development targets using multi-stage builds.
 
