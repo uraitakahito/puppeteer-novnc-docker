@@ -1,17 +1,9 @@
 #
-# Dockerfile for building a Chromium server environment (Multi-stage build)
+# Dockerfile for building a Chromium server environment (Development)
 #
 # ## Features of this Dockerfile
 #
-# This Dockerfile supports two build targets:
-#
-# ### Production (--target production)
-# - Headless Chromium execution (no display server required)
-# - Minimal footprint without Node.js or development tools
-# - Chrome DevTools Protocol access on port 9222 via socat
-# - Use with external CDP client connecting remotely
-#
-# ### Development (--target development)
+# ### Development
 # - You can verify Chromium operations via VNC using a browser
 # - Node.js and Claude Code are pre-installed
 # - Includes dotfiles and extra utilities
@@ -19,7 +11,7 @@
 #
 # ## Preparation
 #
-# ### SSH Agent (Development only)
+# ### SSH Agent
 #
 # Uses ssh-agent. After a restart, if you have not yet initiated an SSH login from your Mac, run the following command on the Mac.
 #
@@ -33,11 +25,9 @@
 #
 # ### Build the Docker image
 #
-#   PROJECT=$(basename `pwd`) && docker image build --target development -t $PROJECT-image:development . --build-arg user_id=`id -u` --build-arg group_id=`id -g` --build-arg TZ=Asia/Tokyo
+#   PROJECT=$(basename `pwd`) && docker image build -f docker/development/Dockerfile -t $PROJECT-image:development . --build-arg user_id=`id -u` --build-arg group_id=`id -g` --build-arg TZ=Asia/Tokyo
 #
 # ### Run the container
-#
-# Development:
 #
 # Create a volume to persist the command history executed inside the Docker container.
 # It is stored in the volume because the dotfiles configuration redirects the shell history there.
@@ -65,11 +55,11 @@
 #
 #   sudo chown -R $(id -u):$(id -g) /zsh-volume
 #
-# ## Launch Claude (Development only)
+# ## Launch Claude
 #
 #   claude --dangerously-skip-permissions
 #
-# ## Process Management (Development only)
+# ## Process Management
 #
 # Chromium and socat are managed by supervisord. To check status:
 #
@@ -79,13 +69,13 @@
 #
 #   supervisorctl -c /etc/supervisor/conf.d/app.conf restart chromium
 #
-# ## Chrome DevTools Protocol (Development only)
+# ## Chrome DevTools Protocol
 #
 # Check CDP availability:
 #
 #   curl http://localhost:9222/json/version
 #
-# ## Connect from Visual Studio Code (Development only)
+# ## Connect from Visual Studio Code
 #
 # 1. Open **Command Palette (Shift + Command + p)**
 # 2. Select **Dev Containers: Attach to Running Container**
@@ -95,16 +85,19 @@
 #   https://code.visualstudio.com/docs/devcontainers/attach-container#_attach-to-a-docker-container
 #
 
-#=============================================
-# Base Stage - Common foundation
-#=============================================
 # Debian 12.12
-FROM debian:bookworm-20251117 AS base
+FROM debian:bookworm-20251117
 
 ARG user_name=developer
 ARG user_id
 ARG group_id
 ARG features_repository="https://github.com/uraitakahito/features.git"
+ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
+ARG extra_utils_repository="https://github.com/uraitakahito/extra-utils.git"
+# Refer to the following URL for Node.js versions:
+#   https://nodejs.org/en/about/previous-releases
+ARG node_version="24.4.0"
+ARG TZ
 
 # Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND=noninteractive
@@ -180,48 +173,6 @@ RUN apt-get update && \
       socat && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-#=============================================
-# Production Stage - Headless Chromium
-#=============================================
-#
-# Headless Chromium execution without Xvfb or Node.js
-# Uses native --headless flag for minimal resource usage
-# External clients connect via Chrome DevTools Protocol (CDP) through socat
-#
-FROM base AS production
-
-ARG user_name=developer
-
-USER ${user_name}
-WORKDIR /app
-
-# Copy supervisor configuration and startup script
-# Note: --chmod=644 is required because:
-#   - The container runs as 'developer' user (non-root)
-#   - Without explicit chmod, COPY preserves the source file's permissions
-#   - If the source file has 600 permissions, supervisord cannot read it
-COPY --chmod=644 supervisord-headless.conf /etc/supervisor/conf.d/app.conf
-COPY --chmod=755 start-chromium-headless.sh /app/start-chromium-headless.sh
-
-# Headless mode execution (Xvfb not required)
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/app.conf"]
-
-#=============================================
-# Development Stage - Full-featured environment
-#=============================================
-#
-# Full-featured development environment with VNC support and Node.js
-#
-FROM base AS development
-
-ARG user_name=developer
-ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
-ARG extra_utils_repository="https://github.com/uraitakahito/extra-utils.git"
-# Refer to the following URL for Node.js versions:
-#   https://nodejs.org/en/about/previous-releases
-ARG node_version="24.4.0"
-ARG TZ
 
 #
 # Install Node
