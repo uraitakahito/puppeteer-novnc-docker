@@ -27,7 +27,7 @@
 #
 # For more details about ssh-agent, see:
 #
-#   https://github.com/uraitakahito/hello-docker/blob/c942ab43712dde4e69c66654eac52d559b41cc49/README.md
+#   https://github.com/uraitakahito/hello-docker/blob/1893a1d98ecd4646bc9c570574d1708586f44bec/README.md
 #
 # ## From Docker build to login
 #
@@ -51,8 +51,8 @@
 #
 # When starting two Docker containers:
 #
-#   docker container run -d --rm --init -v $SSH_AUTH_SOCK:/ssh-agent -p 5901:5901 -p 6080:6080 -p 9222:9222 -e NODE_ENV=development -e SSH_AUTH_SOCK=/ssh-agent --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume --network chromium-network --name chromium-server-1 $PROJECT-image:development
-#   docker container run -d --rm --init -v $SSH_AUTH_SOCK:/ssh-agent -p 5902:5901 -p 6081:6080 -p 9223:9222 -e NODE_ENV=development -e SSH_AUTH_SOCK=/ssh-agent --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume --network chromium-network --name chromium-server-2 $PROJECT-image:development
+#   docker container run -d --rm --init -v /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e NODE_ENV=development --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5901:5901 -p 6080:6080 -p 9222:9222 --network chromium-network --name chromium-server-1 $PROJECT-image:development
+#   docker container run -d --rm --init -v /run/host-services/ssh-auth.sock:/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e NODE_ENV=development --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5902:5901 -p 6081:6080 -p 9223:9222 --network chromium-network --name chromium-server-2 $PROJECT-image:development
 #
 # Log in to Docker:
 #
