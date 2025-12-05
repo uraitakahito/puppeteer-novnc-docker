@@ -33,7 +33,7 @@
 #
 # ### Build the Docker image
 #
-#   PROJECT=$(basename `pwd`) && docker image build --target development -t $PROJECT-image:dev . --build-arg user_id=`id -u` --build-arg group_id=`id -g` --build-arg TZ=Asia/Tokyo
+#   PROJECT=$(basename `pwd`) && docker image build --target development -t $PROJECT-image:development . --build-arg user_id=`id -u` --build-arg group_id=`id -g` --build-arg TZ=Asia/Tokyo
 #
 # ### Run the container
 #
@@ -51,8 +51,8 @@
 #
 # When starting two Docker containers:
 #
-#   docker container run -d --rm --init -v $SSH_AUTH_SOCK:/ssh-agent -p 5901:5901 -p 6080:6080 -p 9222:9222 -e NODE_ENV=development -e SSH_AUTH_SOCK=/ssh-agent --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume --network chromium-network --name chromium-server-1 $PROJECT-image:dev
-#   docker container run -d --rm --init -v $SSH_AUTH_SOCK:/ssh-agent -p 5902:5901 -p 6081:6080 -p 9223:9222 -e NODE_ENV=development -e SSH_AUTH_SOCK=/ssh-agent --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume --network chromium-network --name chromium-server-2 $PROJECT-image:dev
+#   docker container run -d --rm --init -v $SSH_AUTH_SOCK:/ssh-agent -p 5901:5901 -p 6080:6080 -p 9222:9222 -e NODE_ENV=development -e SSH_AUTH_SOCK=/ssh-agent --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume --network chromium-network --name chromium-server-1 $PROJECT-image:development
+#   docker container run -d --rm --init -v $SSH_AUTH_SOCK:/ssh-agent -p 5902:5901 -p 6081:6080 -p 9223:9222 -e NODE_ENV=development -e SSH_AUTH_SOCK=/ssh-agent --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume --network chromium-network --name chromium-server-2 $PROJECT-image:development
 #
 # Log in to Docker:
 #
