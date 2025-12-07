@@ -121,6 +121,9 @@ RUN cd /usr/src && \
 #
 # Add user and install common utils.
 #
+# For the list of installed packages, see:
+#   https://github.com/uraitakahito/features/blob/deb6cf416fda206b99c7b771e9caa12e6952f9c7/src/common-utils/main.sh#L35-L78
+#
 RUN USERNAME=${user_name} \
     USERUID=${user_id} \
     USERGID=${group_id} \
