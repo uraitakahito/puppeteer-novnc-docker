@@ -135,7 +135,7 @@ WORKDIR /app
 # In that case, the host's files are used instead of these copied files.
 COPY --chmod=644 supervisord-headless.conf /etc/supervisor/conf.d/app.conf
 COPY --chmod=755 start-chromium.sh /app/start-chromium.sh
-COPY --chmod=644 chromium-headless.conf /app/chromium.conf
+COPY --chmod=644 chromium-headless.conf /app/chromium-headless.conf
 
 # Headless mode execution (Xvfb not required)
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/app.conf"]
