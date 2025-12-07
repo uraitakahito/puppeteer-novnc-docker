@@ -7,8 +7,8 @@ A Docker environment for running Chromium with Chrome DevTools Protocol (CDP) su
 This project provides Docker environments for running Chromium with Chrome DevTools Protocol (CDP) support.
 
 **Two separate Dockerfiles are available:**
-- **Production** (`docker/production/Dockerfile`): Headless Chromium with minimal footprint
-- **Development** (`docker/development/Dockerfile`): Full-featured environment with VNC, Node.js, and development tools
+- **Production** : Headless Chromium with minimal footprint
+- **Development** : Full-featured environment with VNC, Node.js, and development tools
 
 ## Setup Instructions
 

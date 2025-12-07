@@ -299,8 +299,13 @@ WORKDIR /app
 #   - The container runs as 'developer' user (non-root)
 #   - Without explicit chmod, COPY preserves the source file's permissions
 #   - If the source file has 600 permissions, supervisord cannot read it
+#
+# WARNING: Files copied to /app will be overwritten if you use bind mount:
+#   --mount type=bind,src=`pwd`,dst=/app
+# In that case, the host's files are used instead of these copied files.
 COPY --chmod=644 supervisord-headful.conf /etc/supervisor/conf.d/app.conf
-COPY --chmod=755 start-chromium-headful.sh /app/start-chromium-headful.sh
+COPY --chmod=755 start-chromium.sh /app/start-chromium.sh
+COPY --chmod=644 chromium-headful.conf /app/chromium.conf
 COPY --chmod=755 start-supervised.sh /usr/local/bin/start-supervised.sh
 
 ENTRYPOINT ["/usr/local/share/desktop-init.sh"]
