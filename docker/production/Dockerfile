@@ -140,5 +140,9 @@ COPY --chmod=644 supervisord-headless.conf /etc/supervisor/conf.d/app.conf
 COPY --chmod=755 start-chromium.sh /app/start-chromium.sh
 COPY --chmod=644 chromium-headless.conf /app/chromium-headless.conf
 
+# Health check for CDP availability
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD curl -sf http://localhost:9222/json/version || exit 1
+
 # Headless mode execution (Xvfb not required)
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/app.conf"]

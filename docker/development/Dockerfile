@@ -311,6 +311,10 @@ COPY --chmod=755 start-chromium.sh /app/start-chromium.sh
 COPY --chmod=644 chromium-headful.conf /app/chromium.conf
 COPY --chmod=755 start-supervised.sh /usr/local/bin/start-supervised.sh
 
+# Health check for CDP availability
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD curl -sf http://localhost:9222/json/version || exit 1
+
 ENTRYPOINT ["/usr/local/share/desktop-init.sh"]
 CMD ["/usr/local/bin/start-supervised.sh"]
 ##############################
