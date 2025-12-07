@@ -121,6 +121,9 @@ RUN cd /usr/src && \
 #
 # Add user and install common utils.
 #
+# For the list of installed packages, see:
+#   https://github.com/uraitakahito/features/blob/deb6cf416fda206b99c7b771e9caa12e6952f9c7/src/common-utils/main.sh#L35-L78
+#
 RUN USERNAME=${user_name} \
     USERUID=${user_id} \
     USERGID=${group_id} \
@@ -307,6 +310,10 @@ COPY --chmod=644 supervisord-headful.conf /etc/supervisor/conf.d/app.conf
 COPY --chmod=755 start-chromium.sh /app/start-chromium.sh
 COPY --chmod=644 chromium-headful.conf /app/chromium.conf
 COPY --chmod=755 start-supervised.sh /usr/local/bin/start-supervised.sh
+
+# Health check for CDP availability
+HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
+  CMD curl -sf http://localhost:9222/json/version || exit 1
 
 ENTRYPOINT ["/usr/local/share/desktop-init.sh"]
 CMD ["/usr/local/bin/start-supervised.sh"]
