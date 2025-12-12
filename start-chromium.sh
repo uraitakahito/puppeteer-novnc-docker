@@ -9,7 +9,7 @@
 #
 # Customization:
 #   Mount a custom config file when starting the container:
-#   docker container run -v /path/to/custom.conf:/app/chromium.conf:ro ...
+#   docker container run --mount type=bind,src=/path/to/custom.conf,dst=/app/chromium-headless.conf,readonly ...
 #
 # ## About --remote-debugging-address
 #
