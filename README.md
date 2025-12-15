@@ -18,3 +18,13 @@ This project provides Docker environments for running Chromium with Chrome DevTo
 - **Development**: See [docker/development/Dockerfile](docker/development/Dockerfile)
 
 This ensures a single source of truth and prevents documentation from becoming outdated.
+
+## Related Projects
+
+### BrowserHive
+
+[BrowserHive](https://github.com/uraitakahito/browserhive) is a scalable web page capture server that uses this project as its browser backend. It provides:
+
+- gRPC API for screenshot and HTML extraction
+- Worker pool architecture for parallel processing
+- Support for multiple remote Chromium instances via CDP
