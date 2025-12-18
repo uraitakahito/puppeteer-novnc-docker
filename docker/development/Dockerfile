@@ -308,7 +308,7 @@ WORKDIR /app
 # In that case, the host's files are used instead of these copied files.
 COPY --chmod=644 supervisord-headful.conf /etc/supervisor/conf.d/app.conf
 COPY --chmod=755 start-chromium.sh /app/start-chromium.sh
-COPY --chmod=644 chromium-headful.conf /app/chromium.conf
+COPY --chmod=644 chromium-headful.conf /app/chromium-headful.conf
 COPY --chmod=755 start-supervised.sh /usr/local/bin/start-supervised.sh
 
 # Health check for CDP availability
