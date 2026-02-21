@@ -4,22 +4,12 @@
 # ## Features of this Dockerfile
 #
 # ### Development
-# - You can verify Chromium operations via VNC using a browser
+#
+# - You can verify Chromium operations via noVNC in a browser at http://localhost:6080/ (or http://localhost:6081/ for the second container)
 # - Node.js and Claude Code are pre-installed
 # - Includes dotfiles and extra utilities
 # - Assumes host OS is Mac
-#
-# ## Preparation
-#
-# ### SSH Agent
-#
-# Uses ssh-agent. After a restart, if you have not yet initiated an SSH login from your Mac, run the following command on the Mac.
-#
-#   ssh-add --apple-use-keychain ~/.ssh/id_ed25519
-#
-# For more details about ssh-agent, see:
-#
-#   https://github.com/uraitakahito/hello-docker/blob/1893a1d98ecd4646bc9c570574d1708586f44bec/README.md
+# - Passes the GH_TOKEN environment variable into the container
 #
 # ## From Docker build to login
 #
@@ -41,23 +31,14 @@
 #
 # When starting two Docker containers:
 #
-#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e NODE_ENV=development --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5901:5901 -p 6080:6080 -p 9222:9222 --network chromium-network --name chromium-server-1 $PROJECT-image:development
-#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e NODE_ENV=development --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5902:5901 -p 6081:6080 -p 9223:9222 --network chromium-network --name chromium-server-2 $PROJECT-image:development
+#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e GH_TOKEN=$(gh auth token) -e NODE_ENV=development --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5901:5901 -p 6080:6080 -p 9222:9222 --network chromium-network --name chromium-server-1 $PROJECT-image:development
+#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e GH_TOKEN=$(gh auth token) -e NODE_ENV=development --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5902:5901 -p 6081:6080 -p 9223:9222 --network chromium-network --name chromium-server-2 $PROJECT-image:development
 #
-# Log in to Docker:
+# Log into the container.
 #
-#   fdshell /bin/zsh
-#
-# About fdshell:
-#   https://github.com/uraitakahito/dotfiles/blob/37c4142038c658c468ade085cbc8883ba0ce1cc3/zsh/myzshrc#L93-L101
-#
-# Only for the first startup, change the owner of the command history folder:
+# (First time only) Change the owner of the command history folder:
 #
 #   sudo chown -R $(id -u):$(id -g) /zsh-volume
-#
-# ## Launch Claude
-#
-#   claude --dangerously-skip-permissions
 #
 # ## Process Management
 #
@@ -85,8 +66,8 @@
 #   https://code.visualstudio.com/docs/devcontainers/attach-container#_attach-to-a-docker-container
 #
 
-# Debian 12.12
-FROM debian:bookworm-20251117
+# Debian 12.13
+FROM debian:bookworm-20260202
 
 ARG user_name=developer
 ARG user_id
