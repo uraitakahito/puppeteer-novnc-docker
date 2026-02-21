@@ -39,10 +39,6 @@
 #
 #   sudo chown -R $(id -u):$(id -g) /zsh-volume
 #
-# ## Launch Claude
-#
-#   claude --dangerously-skip-permissions
-#
 # ## Process Management
 #
 # Chromium and socat are managed by supervisord. To check status:
