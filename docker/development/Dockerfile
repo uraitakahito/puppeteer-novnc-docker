@@ -9,18 +9,6 @@
 # - Includes dotfiles and extra utilities
 # - Assumes host OS is Mac
 #
-# ## Preparation
-#
-# ### SSH Agent
-#
-# Uses ssh-agent. After a restart, if you have not yet initiated an SSH login from your Mac, run the following command on the Mac.
-#
-#   ssh-add --apple-use-keychain ~/.ssh/id_ed25519
-#
-# For more details about ssh-agent, see:
-#
-#   https://github.com/uraitakahito/hello-docker/blob/1893a1d98ecd4646bc9c570574d1708586f44bec/README.md
-#
 # ## From Docker build to login
 #
 # ### Build the Docker image
