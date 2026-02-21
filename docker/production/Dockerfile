@@ -42,6 +42,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 ARG LANG=C.UTF-8
 ENV LANG="$LANG"
+ARG TZ=UTC
+ENV TZ="$TZ"
 
 #
 # Git
