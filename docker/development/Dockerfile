@@ -4,7 +4,8 @@
 # ## Features of this Dockerfile
 #
 # ### Development
-# - You can verify Chromium operations via VNC using a browser
+#
+# - You can verify Chromium operations via noVNC in a browser at http://localhost:6080/ (or http://localhost:6081/ for the second container)
 # - Node.js and Claude Code are pre-installed
 # - Includes dotfiles and extra utilities
 # - Assumes host OS is Mac
