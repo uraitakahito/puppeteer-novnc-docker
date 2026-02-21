@@ -6,18 +6,18 @@
 # ### Development
 #
 # - You can verify Chromium operations via noVNC in a browser at http://localhost:6080/ (or http://localhost:6081/ for the second container)
-# - Node.js and Claude Code are pre-installed
+# - Claude Code is pre-installed
 # - Includes dotfiles and extra utilities
 # - Assumes host OS is Mac
 # - Passes the GH_TOKEN environment variable into the container
 #
 # ## From Docker build to login
 #
-# ### Build the Docker image
+# Build the Docker image:
 #
 #   PROJECT=$(basename `pwd`) && docker image build -f docker/development/Dockerfile -t $PROJECT-image:development . --build-arg user_id=`id -u` --build-arg group_id=`id -g` --build-arg TZ=Asia/Tokyo
 #
-# ### Run the container
+# (First time only) Create a volume for command history:
 #
 # Create a volume to persist the command history executed inside the Docker container.
 # It is stored in the volume because the dotfiles configuration redirects the shell history there.
@@ -31,8 +31,8 @@
 #
 # When starting two Docker containers:
 #
-#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e GH_TOKEN=$(gh auth token) -e NODE_ENV=development --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5901:5901 -p 6080:6080 -p 9222:9222 --network chromium-network --name chromium-server-1 $PROJECT-image:development
-#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e GH_TOKEN=$(gh auth token) -e NODE_ENV=development --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5902:5901 -p 6081:6080 -p 9223:9222 --network chromium-network --name chromium-server-2 $PROJECT-image:development
+#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e GH_TOKEN=$(gh auth token) --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5901:5901 -p 6080:6080 -p 9222:9222 --network chromium-network --name chromium-server-1 $PROJECT-image:development
+#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e GH_TOKEN=$(gh auth token) --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5902:5901 -p 6081:6080 -p 9223:9222 --network chromium-network --name chromium-server-2 $PROJECT-image:development
 #
 # Log into the container.
 #
@@ -75,13 +75,14 @@ ARG group_id
 ARG features_repository="https://github.com/uraitakahito/features.git"
 ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
 ARG extra_utils_repository="https://github.com/uraitakahito/extra-utils.git"
-# Refer to the following URL for Node.js versions:
-#   https://nodejs.org/en/about/previous-releases
-ARG node_version="24.4.0"
-ARG TZ
 
 # Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND=noninteractive
+
+ARG LANG=C.UTF-8
+ENV LANG="$LANG"
+ARG TZ=UTC
+ENV TZ="$TZ"
 
 #
 # Git
@@ -115,6 +116,17 @@ RUN USERNAME=${user_name} \
   #   https://github.com/uraitakahito/features/blob/59e8acea74ff0accd5c2c6f98ede1191a9e3b2aa/src/common-utils/main.sh#L467-L471
   ADDUSERTOROOTGROUP=true \
     /usr/src/features/src/common-utils/install.sh
+
+#
+# Install extra utils.
+#
+RUN cd /usr/src && \
+  git clone --depth 1 ${extra_utils_repository} && \
+  ADDEZA=true \
+  ADDCLAUDECODE=true \
+  # Claude Code is installed under $HOME, so the username must be specified.
+  USERNAME=${user_name} \
+    /usr/src/extra-utils/utils/install.sh
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer
@@ -162,17 +174,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-#
-# Install Node
-#   https://github.com/uraitakahito/features/blob/develop/src/node/install.sh
-#
-RUN INSTALLYARNUSINGAPT=false \
-    NVMVERSION="latest" \
-    PNPM_VERSION="none" \
-    USERNAME=${user_name} \
-    VERSION=${node_version} \
-      /usr/src/features/src/node/install.sh
-
 # Puppeteer environment variables (development only, for running automation scripts)
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
@@ -186,15 +187,6 @@ RUN apt-get update && \
       xvfb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-#
-# Install extra utils.
-#
-RUN cd /usr/src && \
-  git clone --depth 1 ${extra_utils_repository} && \
-  ADDEZA=true \
-  UPGRADEPACKAGES=false \
-    /usr/src/extra-utils/utils/install.sh
 
 ##############################
 #  VNC support starts here   #
@@ -220,17 +212,6 @@ USER ${user_name}
 RUN cd /home/${user_name} && \
   git clone --depth 1 ${dotfiles_repository} && \
   dotfiles/install.sh
-
-#
-# Claude Code
-#
-# Discussion about using nvm during Docker container build:
-#   https://stackoverflow.com/questions/25899912/how-to-install-nvm-in-docker
-#
-# There is an official devcontainer. You may use the official one instead of this Dockerfile.
-#   https://github.com/anthropics/claude-code/blob/main/.devcontainer/Dockerfile
-#
-RUN curl -fsSL https://claude.ai/install.sh | bash
 
 ####################################
 #  Puppeteer support starts here   #
@@ -273,7 +254,6 @@ RUN curl -fsSL https://claude.ai/install.sh | bash
 # desktop-lite
 # https://github.com/uraitakahito/features/blob/0e14fce20c1008c837ac6b31b04297bd35108f9e/src/desktop-lite/install.sh#L296-L417
 #
-ENV TZ="$TZ"
 ENV USERNAME=${user_name}
 ENV VNC_PORT=5901
 ENV NOVNC_PORT=6080
