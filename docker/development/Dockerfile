@@ -6,7 +6,7 @@
 # ### Development
 #
 # - You can verify Chromium operations via noVNC in a browser at http://localhost:6080/ (or http://localhost:6081/ for the second container)
-# - Node.js and Claude Code are pre-installed
+# - Claude Code is pre-installed
 # - Includes dotfiles and extra utilities
 # - Assumes host OS is Mac
 # - Passes the GH_TOKEN environment variable into the container
@@ -31,8 +31,8 @@
 #
 # When starting two Docker containers:
 #
-#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e GH_TOKEN=$(gh auth token) -e NODE_ENV=development --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5901:5901 -p 6080:6080 -p 9222:9222 --network chromium-network --name chromium-server-1 $PROJECT-image:development
-#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e GH_TOKEN=$(gh auth token) -e NODE_ENV=development --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5902:5901 -p 6081:6080 -p 9223:9222 --network chromium-network --name chromium-server-2 $PROJECT-image:development
+#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e GH_TOKEN=$(gh auth token) --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5901:5901 -p 6080:6080 -p 9222:9222 --network chromium-network --name chromium-server-1 $PROJECT-image:development
+#   docker container run -d --rm --init --mount type=bind,src=/run/host-services/ssh-auth.sock,dst=/run/host-services/ssh-auth.sock -e SSH_AUTH_SOCK=/run/host-services/ssh-auth.sock -e GH_TOKEN=$(gh auth token) --mount type=bind,src=`pwd`,dst=/app --mount type=volume,source=$PROJECT-zsh-history,target=/zsh-volume -p 5902:5901 -p 6081:6080 -p 9223:9222 --network chromium-network --name chromium-server-2 $PROJECT-image:development
 #
 # Log into the container.
 #
@@ -75,9 +75,6 @@ ARG group_id
 ARG features_repository="https://github.com/uraitakahito/features.git"
 ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
 ARG extra_utils_repository="https://github.com/uraitakahito/extra-utils.git"
-# Refer to the following URL for Node.js versions:
-#   https://nodejs.org/en/about/previous-releases
-ARG node_version="24.4.0"
 ARG TZ
 
 # Avoid warnings by switching to noninteractive for the build process
@@ -161,17 +158,6 @@ RUN apt-get update && \
       socat && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-#
-# Install Node
-#   https://github.com/uraitakahito/features/blob/develop/src/node/install.sh
-#
-RUN INSTALLYARNUSINGAPT=false \
-    NVMVERSION="latest" \
-    PNPM_VERSION="none" \
-    USERNAME=${user_name} \
-    VERSION=${node_version} \
-      /usr/src/features/src/node/install.sh
 
 # Puppeteer environment variables (development only, for running automation scripts)
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
