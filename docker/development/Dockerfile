@@ -75,7 +75,6 @@ ARG group_id
 ARG features_repository="https://github.com/uraitakahito/features.git"
 ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
 ARG extra_utils_repository="https://github.com/uraitakahito/extra-utils.git"
-ARG TZ
 
 # Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND=noninteractive
@@ -88,6 +87,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 #
 ARG LANG=C.UTF-8
 ENV LANG="$LANG"
+
+#
+# Timezone
+#
+ARG TZ=UTC
+ENV TZ="$TZ"
 
 #
 # Git
@@ -260,7 +265,6 @@ RUN cd /home/${user_name} && \
 # desktop-lite
 # https://github.com/uraitakahito/features/blob/0e14fce20c1008c837ac6b31b04297bd35108f9e/src/desktop-lite/install.sh#L296-L417
 #
-ENV TZ="$TZ"
 ENV USERNAME=${user_name}
 ENV VNC_PORT=5901
 ENV NOVNC_PORT=6080
