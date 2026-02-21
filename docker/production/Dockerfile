@@ -28,8 +28,8 @@
 #   curl http://localhost:9222/json/version
 #
 
-# Debian 12.12 slim variant
-FROM debian:bookworm-20251117-slim
+# Debian 12.13 slim variant
+FROM debian:bookworm-20260202-slim
 
 ARG user_name=developer
 ARG user_id
