@@ -106,11 +106,15 @@ RUN cd /usr/src && \
 #   https://github.com/uraitakahito/features/blob/deb6cf416fda206b99c7b771e9caa12e6952f9c7/src/common-utils/main.sh#L35-L78
 #
 RUN USERNAME=${user_name} \
-    USERUID=${user_id} \
-    USERGID=${group_id} \
-    CONFIGUREZSHASDEFAULTSHELL=true \
-    UPGRADEPACKAGES=false \
-      /usr/src/features/src/common-utils/install.sh
+  USERUID=${user_id} \
+  USERGID=${group_id} \
+  CONFIGUREZSHASDEFAULTSHELL=true \
+  UPGRADEPACKAGES=false \
+  # When using ssh-agent inside Docker, add the user to the root group
+  # to ensure permission to access the mounted socket.
+  #   https://github.com/uraitakahito/features/blob/59e8acea74ff0accd5c2c6f98ede1191a9e3b2aa/src/common-utils/main.sh#L467-L471
+  ADDUSERTOROOTGROUP=true \
+    /usr/src/features/src/common-utils/install.sh
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer
