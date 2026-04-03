@@ -29,13 +29,17 @@
 #
 
 # Debian 12.13 slim variant
-FROM debian:bookworm-20260202-slim
+FROM debian:bookworm-20260316-slim
 
 ARG user_name=developer
 ARG user_id
 ARG group_id
-ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles-production.git"
+# https://github.com/uraitakahito/dotfiles/releases/tag/1.1.0
+ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
+ARG dotfiles_commit="0484e07cffd330d86e1f914c33a008ba2d9cba37"
+# https://github.com/uraitakahito/features/releases/tag/1.0.0
 ARG features_repository="https://github.com/uraitakahito/features.git"
+ARG features_commit="e8d887d2e17e79f5289b0e8a087dd0730dcad24e"
 
 # Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND=noninteractive
@@ -49,17 +53,19 @@ ENV TZ="$TZ"
 # Git
 #
 RUN apt-get update -qq && \
-  apt-get install -y -qq --no-install-recommends \
-    ca-certificates \
-    git && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
+    apt-get install -y -qq --no-install-recommends \
+        ca-certificates \
+        git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 #
 # clone features
 #
 RUN cd /usr/src && \
-  git clone --depth 1 ${features_repository}
+    git clone ${features_repository} && \
+    cd features && \
+    git checkout ${features_commit}
 
 #
 # Add user and install common utils.
@@ -72,7 +78,7 @@ RUN USERNAME=${user_name} \
     USERGID=${group_id} \
     CONFIGUREZSHASDEFAULTSHELL=true \
     UPGRADEPACKAGES=false \
-      /usr/src/features/src/common-utils/install.sh
+        /usr/src/features/src/common-utils/install.sh
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer
@@ -80,13 +86,13 @@ RUN USERNAME=${user_name} \
 # https://zenn.dev/tom1111/articles/0dc7cde5c8e9bf
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      chromium \
-      chromium-sandbox \
-      fonts-ipafont-gothic \
-      fonts-wqy-zenhei \
-      fonts-thai-tlwg \
-      fonts-kacst \
-      fonts-freefont-ttf && \
+        chromium \
+        chromium-sandbox \
+        fonts-ipafont-gothic \
+        fonts-wqy-zenhei \
+        fonts-thai-tlwg \
+        fonts-kacst \
+        fonts-freefont-ttf && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -116,7 +122,7 @@ RUN apt-get update && \
 #
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      socat && \
+        socat && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -126,9 +132,11 @@ USER ${user_name}
 # dotfiles (minimal configuration for production)
 #
 RUN cd /home/${user_name} && \
-  git clone --depth 1 ${dotfiles_repository} dotfiles && \
-  ln -sf ~/dotfiles/.vimrc ~/.vimrc && \
-  ln -sf ~/dotfiles/.tmux.conf ~/.tmux.conf
+    git clone ${dotfiles_repository} && \
+    cd dotfiles && \
+    git checkout ${dotfiles_commit} && \
+    ln -sf ~/dotfiles/.vimrc ~/.vimrc && \
+    ln -sf ~/dotfiles/.tmux.conf ~/.tmux.conf
 
 WORKDIR /app
 
@@ -147,7 +155,7 @@ COPY --chmod=644 chromium-headless.conf /app/chromium-headless.conf
 
 # Health check for CDP availability
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-  CMD curl -sf http://localhost:9222/json/version || exit 1
+    CMD curl -sf http://localhost:9222/json/version || exit 1
 
 # Headless mode execution (Xvfb not required)
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/app.conf"]
