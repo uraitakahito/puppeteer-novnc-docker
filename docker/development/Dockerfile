@@ -94,11 +94,11 @@ ENV TZ="$TZ"
 # Git
 #
 RUN apt-get update -qq && \
-  apt-get install -y -qq --no-install-recommends \
-    ca-certificates \
-    git && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
+    apt-get install -y -qq --no-install-recommends \
+        ca-certificates \
+        git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 #
 # clone features
@@ -115,15 +115,15 @@ RUN cd /usr/src && \
 #   https://github.com/uraitakahito/features/blob/deb6cf416fda206b99c7b771e9caa12e6952f9c7/src/common-utils/main.sh#L35-L78
 #
 RUN USERNAME=${user_name} \
-  USERUID=${user_id} \
-  USERGID=${group_id} \
-  CONFIGUREZSHASDEFAULTSHELL=true \
-  UPGRADEPACKAGES=false \
-  # When using ssh-agent inside Docker, add the user to the root group
-  # to ensure permission to access the mounted socket.
-  #   https://github.com/uraitakahito/features/blob/59e8acea74ff0accd5c2c6f98ede1191a9e3b2aa/src/common-utils/main.sh#L467-L471
-  ADDUSERTOROOTGROUP=true \
-    /usr/src/features/src/common-utils/install.sh
+    USERUID=${user_id} \
+    USERGID=${group_id} \
+    CONFIGUREZSHASDEFAULTSHELL=true \
+    UPGRADEPACKAGES=false \
+    # When using ssh-agent inside Docker, add the user to the root group
+    # to ensure permission to access the mounted socket.
+    #   https://github.com/uraitakahito/features/blob/59e8acea74ff0accd5c2c6f98ede1191a9e3b2aa/src/common-utils/main.sh#L467-L471
+    ADDUSERTOROOTGROUP=true \
+        /usr/src/features/src/common-utils/install.sh
 
 #
 # Install extra utils.
@@ -149,13 +149,13 @@ RUN cd /usr/src && \
 # https://zenn.dev/tom1111/articles/0dc7cde5c8e9bf
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      chromium \
-      chromium-sandbox \
-      fonts-ipafont-gothic \
-      fonts-wqy-zenhei \
-      fonts-thai-tlwg \
-      fonts-kacst \
-      fonts-freefont-ttf && \
+        chromium \
+        chromium-sandbox \
+        fonts-ipafont-gothic \
+        fonts-wqy-zenhei \
+        fonts-thai-tlwg \
+        fonts-kacst \
+        fonts-freefont-ttf && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -185,7 +185,7 @@ RUN apt-get update && \
 #
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      socat && \
+        socat && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -199,7 +199,7 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 #
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      xvfb && \
+        xvfb && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -217,7 +217,7 @@ RUN /usr/src/features/src/desktop-lite/install.sh
 ##############################
 
 RUN usermod -aG audio ${user_name} && \
-  usermod -aG video ${user_name}
+    usermod -aG video ${user_name}
 
 USER ${user_name}
 
@@ -292,7 +292,7 @@ COPY --chmod=755 start-supervised.sh /usr/local/bin/start-supervised.sh
 
 # Health check for CDP availability
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-  CMD curl -sf http://localhost:9222/json/version || exit 1
+    CMD curl -sf http://localhost:9222/json/version || exit 1
 
 ENTRYPOINT ["/usr/local/share/desktop-init.sh"]
 CMD ["/usr/local/bin/start-supervised.sh"]

@@ -53,11 +53,11 @@ ENV TZ="$TZ"
 # Git
 #
 RUN apt-get update -qq && \
-  apt-get install -y -qq --no-install-recommends \
-    ca-certificates \
-    git && \
-  apt-get clean && \
-  rm -rf /var/lib/apt/lists/*
+    apt-get install -y -qq --no-install-recommends \
+        ca-certificates \
+        git && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 #
 # clone features
@@ -78,7 +78,7 @@ RUN USERNAME=${user_name} \
     USERGID=${group_id} \
     CONFIGUREZSHASDEFAULTSHELL=true \
     UPGRADEPACKAGES=false \
-      /usr/src/features/src/common-utils/install.sh
+        /usr/src/features/src/common-utils/install.sh
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer
@@ -86,13 +86,13 @@ RUN USERNAME=${user_name} \
 # https://zenn.dev/tom1111/articles/0dc7cde5c8e9bf
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      chromium \
-      chromium-sandbox \
-      fonts-ipafont-gothic \
-      fonts-wqy-zenhei \
-      fonts-thai-tlwg \
-      fonts-kacst \
-      fonts-freefont-ttf && \
+        chromium \
+        chromium-sandbox \
+        fonts-ipafont-gothic \
+        fonts-wqy-zenhei \
+        fonts-thai-tlwg \
+        fonts-kacst \
+        fonts-freefont-ttf && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -122,7 +122,7 @@ RUN apt-get update && \
 #
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-      socat && \
+        socat && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -155,7 +155,7 @@ COPY --chmod=644 chromium-headless.conf /app/chromium-headless.conf
 
 # Health check for CDP availability
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
-  CMD curl -sf http://localhost:9222/json/version || exit 1
+    CMD curl -sf http://localhost:9222/json/version || exit 1
 
 # Headless mode execution (Xvfb not required)
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/app.conf"]
