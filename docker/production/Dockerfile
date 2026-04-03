@@ -29,13 +29,17 @@
 #
 
 # Debian 12.13 slim variant
-FROM debian:bookworm-20260202-slim
+FROM debian:bookworm-20260316-slim
 
 ARG user_name=developer
 ARG user_id
 ARG group_id
-ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles-production.git"
+# https://github.com/uraitakahito/dotfiles/releases/tag/1.1.0
+ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
+ARG dotfiles_commit="0484e07cffd330d86e1f914c33a008ba2d9cba37"
+# https://github.com/uraitakahito/features/releases/tag/1.0.0
 ARG features_repository="https://github.com/uraitakahito/features.git"
+ARG features_commit="e8d887d2e17e79f5289b0e8a087dd0730dcad24e"
 
 # Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND=noninteractive
@@ -59,7 +63,9 @@ RUN apt-get update -qq && \
 # clone features
 #
 RUN cd /usr/src && \
-  git clone --depth 1 ${features_repository}
+    git clone ${features_repository} && \
+    cd features && \
+    git checkout ${features_commit}
 
 #
 # Add user and install common utils.
@@ -126,9 +132,11 @@ USER ${user_name}
 # dotfiles (minimal configuration for production)
 #
 RUN cd /home/${user_name} && \
-  git clone --depth 1 ${dotfiles_repository} dotfiles && \
-  ln -sf ~/dotfiles/.vimrc ~/.vimrc && \
-  ln -sf ~/dotfiles/.tmux.conf ~/.tmux.conf
+    git clone ${dotfiles_repository} && \
+    cd dotfiles && \
+    git checkout ${dotfiles_commit} && \
+    ln -sf ~/dotfiles/.vimrc ~/.vimrc && \
+    ln -sf ~/dotfiles/.tmux.conf ~/.tmux.conf
 
 WORKDIR /app
 
