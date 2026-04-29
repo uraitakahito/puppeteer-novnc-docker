@@ -67,20 +67,20 @@
 #
 
 # Debian 12.13
-FROM debian:bookworm-20260316
+FROM debian:bookworm-20260421
 
 ARG user_name=developer
 ARG user_id
 ARG group_id
-# https://github.com/uraitakahito/dotfiles/releases/tag/1.1.0
+# https://github.com/uraitakahito/dotfiles/releases/tag/1.1.4
 ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
-ARG dotfiles_commit="0484e07cffd330d86e1f914c33a008ba2d9cba37"
+ARG dotfiles_commit="622bb525a8a46275871bfdc7cf2826c1c489021a"
 # https://github.com/uraitakahito/features/releases/tag/1.0.0
 ARG features_repository="https://github.com/uraitakahito/features.git"
 ARG features_commit="e8d887d2e17e79f5289b0e8a087dd0730dcad24e"
-# https://github.com/uraitakahito/extra-utils/releases/tag/1.0.0
+# https://github.com/uraitakahito/extra-utils/releases/tag/1.1.0
 ARG extra_utils_repository="https://github.com/uraitakahito/extra-utils.git"
-ARG extra_utils_commit="3fb9cf4625cdd57270adc48ddf1b230cf151fdf0"
+ARG extra_utils_commit="2c5b1ab72c7b98b2a9c42c084aa6b67cdaa36625"
 
 # Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND=noninteractive
@@ -192,16 +192,6 @@ RUN apt-get update && \
 # Puppeteer environment variables (development only, for running automation scripts)
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-
-#
-# Xvfb (X Virtual Framebuffer)
-# Provides a virtual display for VNC-based visual debugging
-#
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        xvfb && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 ##############################
 #  VNC support starts here   #
