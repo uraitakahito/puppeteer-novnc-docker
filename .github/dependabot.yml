@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # --- Docker base images (FROM lines in both Dockerfiles) ---
+  - package-ecosystem: docker
+    directories:
+      - /docker/production
+      - /docker/development
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - docker
+
+  # --- GitHub Actions (SHA-pinned in workflows) ---
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: develop
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    labels:
+      - ci
+    groups:
+      actions:
+        patterns:
+          - "*"

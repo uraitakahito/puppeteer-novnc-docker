@@ -1,0 +1,26 @@
+name: shellcheck
+
+on:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - '**/*.sh'
+      - '.github/workflows/shellcheck.yml'
+
+jobs:
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: reviewdog/action-shellcheck@853366d6a4afe65985b8f9ba43924a4afc0a45c9 # v1.32.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          path: '.'
+          pattern: '*.sh'
+          level: error
+          fail_level: error
