@@ -34,9 +34,9 @@ FROM debian:bookworm-20260421-slim
 ARG user_name=developer
 ARG user_id
 ARG group_id
-# https://github.com/uraitakahito/dotfiles/releases/tag/1.1.4
-ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
-ARG dotfiles_commit="622bb525a8a46275871bfdc7cf2826c1c489021a"
+# https://github.com/uraitakahito/dotfiles-production/releases/tag/1.0.0
+ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles-production.git"
+ARG dotfiles_commit="ed6bb006bb418acb57e127bcc7d1033f40a63432"
 # https://github.com/uraitakahito/features/releases/tag/1.0.0
 ARG features_repository="https://github.com/uraitakahito/features.git"
 ARG features_commit="e8d887d2e17e79f5289b0e8a087dd0730dcad24e"
@@ -129,14 +129,13 @@ RUN apt-get update && \
 USER ${user_name}
 
 #
-# dotfiles (minimal configuration for production)
+# dotfiles
 #
 RUN cd /home/${user_name} && \
     git clone ${dotfiles_repository} && \
-    cd dotfiles && \
+    cd dotfiles-production && \
     git checkout ${dotfiles_commit} && \
-    ln -sf ~/dotfiles/.vimrc ~/.vimrc && \
-    ln -sf ~/dotfiles/.tmux.conf ~/.tmux.conf
+    ./install.sh
 
 WORKDIR /app
 
