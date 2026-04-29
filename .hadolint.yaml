@@ -1,0 +1,10 @@
+ignored:
+  # Pinning apt versions on Debian rolling repos provides little safety and
+  # frequently breaks at the next snapshot. The base image is already pinned.
+  - DL3008
+  # `cd && git clone && cd && git checkout` is intentional for pinned-commit
+  # external repo cloning; WORKDIR would force layer fragmentation.
+  - DL3003
+
+trustedRegistries:
+  - docker.io

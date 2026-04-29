@@ -44,4 +44,7 @@ CHROMIUM_ARGS=$(grep -v '^[[:space:]]*#' "${CONFIG_FILE}" | grep -v '^[[:space:]
 echo "Starting Chromium with config: ${CONFIG_FILE}"
 echo "Arguments: ${CHROMIUM_ARGS}"
 
+# Word splitting is intentional: each whitespace-separated token must become
+# its own argv entry so chromium parses one flag per element.
+# shellcheck disable=SC2086
 exec chromium ${CHROMIUM_ARGS}
