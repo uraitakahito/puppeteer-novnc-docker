@@ -193,16 +193,6 @@ RUN apt-get update && \
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-#
-# Xvfb (X Virtual Framebuffer)
-# Provides a virtual display for VNC-based visual debugging
-#
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        xvfb && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
 ##############################
 #  VNC support starts here   #
 ##############################
