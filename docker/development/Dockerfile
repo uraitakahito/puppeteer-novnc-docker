@@ -160,6 +160,42 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 #
+# dbus daemon for session-bus wrapping
+#
+# Chromium probes the dbus session bus at startup for several
+# subsystems (Notifications, ScreenSaver, AT-SPI). Without any
+# session bus reachable, each probe emits a "Failed to connect to
+# the bus" line to stderr on every container launch.
+#
+# We install the `dbus` package because `start-chromium.sh` invokes
+# `dbus-run-session chromium ...`. That helper, shipped in `dbus`,
+# spawns a fresh per-process session bus, exports
+# DBUS_SESSION_BUS_ADDRESS for the wrapped command, forwards
+# SIGHUP/SIGTERM/SIGINT to the child, and tears the daemon down
+# when chromium exits. No long-lived dbus daemon is needed in
+# supervisord.
+#
+# Why NOT `dbus-x11` + DBUS_SESSION_BUS_ADDRESS=autolaunch:
+# `dbus-launch --autolaunch` (from `dbus-x11`) requires $DISPLAY
+# — it uses an X11 atom to coordinate daemons — and refuses to
+# spawn without it. Empirically broken in fully-headless containers
+# like this one, so `dbus-x11` is deliberately NOT installed.
+#
+# Scope: this silences SESSION-bus errors only. SYSTEM-bus probes
+# (UPower, NetworkManager, BlueZ) still fail because
+# `dbus-daemon --system` is intentionally not running — running it
+# would require a long-lived root daemon and contradict this image's
+# "thin CDP container" stance. Remaining system-bus stderr
+# noise is acknowledged and left for log-aggregation-layer
+# filtering.
+#
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        dbus && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+#
 # supervisor for process management
 #
 RUN apt-get update && \
