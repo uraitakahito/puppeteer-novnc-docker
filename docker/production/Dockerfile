@@ -33,9 +33,6 @@ FROM debian:bookworm-20260518-slim
 ARG user_name=developer
 ARG user_id
 ARG group_id
-# https://github.com/uraitakahito/features/releases/tag/2.0.1
-ARG features_repository="https://github.com/uraitakahito/features.git"
-ARG features_commit="9f7e672e27207f374d56e5da7f862b0b5b110b3f"
 
 # Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND=noninteractive
@@ -46,35 +43,26 @@ ARG TZ=UTC
 ENV TZ="$TZ"
 
 #
-# Git
+# Create unprivileged user + install runtime essentials.
 #
-RUN apt-get update -qq && \
-    apt-get install -y -qq --no-install-recommends \
+# HEALTHCHECK depends on `curl`; keep it explicit here so future
+# refactors of this Dockerfile cannot silently drop it. `ca-certificates`
+# is needed for any TLS the container might do (CDP itself is plain HTTP
+# locally, but downstream code paths may reach TLS endpoints).
+#
+# We intentionally do NOT pull in a wider utility set (jq, htop, sudo,
+# manpages, etc.). This image is driven externally over CDP and is not
+# meant to be `docker exec`-ed into for ad-hoc operations.
+#
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
         ca-certificates \
-        git && \
+        curl && \
+    groupadd --gid ${group_id} ${user_name} && \
+    useradd --uid ${user_id} --gid ${group_id} \
+            --create-home --shell /bin/bash ${user_name} && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
-
-#
-# clone features
-#
-RUN cd /usr/src && \
-    git clone ${features_repository} && \
-    cd features && \
-    git checkout ${features_commit}
-
-#
-# Add user and install common utils.
-#
-# For the list of installed packages, see:
-#   https://github.com/uraitakahito/features/blob/9f7e672e27207f374d56e5da7f862b0b5b110b3f/src/common-utils/main.sh#L35-L79
-#
-RUN USERNAME=${user_name} \
-    USERUID=${user_id} \
-    USERGID=${group_id} \
-    CONFIGUREZSHASDEFAULTSHELL=true \
-    UPGRADEPACKAGES=false \
-        /usr/src/features/src/common-utils/install.sh
 
 # Install latest chrome dev package and fonts to support major charsets (Chinese, Japanese, Arabic, Hebrew, Thai and a few others)
 # Note: this installs the necessary libs to make the bundled version of Chromium that Puppeteer
