@@ -14,7 +14,7 @@
 #
 # ### Build the Docker image
 #
-#   PROJECT=$(basename `pwd`) && docker image build -f docker/production/Dockerfile -t $PROJECT-image:production . --build-arg user_id=`id -u` --build-arg group_id=`id -g`
+#   PROJECT=$(basename `pwd`) && docker image build -f docker/production/Dockerfile -t $PROJECT-image:production .
 #
 # ### Run the container
 #
@@ -31,9 +31,18 @@
 # multi-arch manifest list digest pins the actual bits we resolve to.
 FROM debian:bookworm-20260518-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb
 
-ARG user_name=developer
-ARG user_id
-ARG group_id
+# Production image runs Chromium as an unprivileged system user. The
+# user / group are created with --system so their UID / GID land in
+# the Debian system range (100-999), avoiding collisions with arbitrary
+# host UID / GID values that build-time ARGs would have to pass
+# through. (macOS hosts default to GID 20 for the `staff` group, which
+# collides with Debian's `dialout` group at the same GID; an explicit
+# `groupadd --gid 20` fails on those hosts with no useful diagnostic.)
+#
+# Bind mounts are intentionally NOT used on production chromium-server
+# containers, so matching host file ownership is not a requirement
+# here. The development image keeps the ARG-based user creation
+# because dev *does* bind-mount source code under /app.
 
 # Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND=noninteractive
@@ -59,9 +68,9 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         ca-certificates \
         curl && \
-    groupadd --gid ${group_id} ${user_name} && \
-    useradd --uid ${user_id} --gid ${group_id} \
-            --create-home --shell /bin/bash ${user_name} && \
+    groupadd --system chromium && \
+    useradd --system --gid chromium \
+            --create-home --shell /bin/bash chromium && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -147,13 +156,13 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-USER ${user_name}
+USER chromium
 
 WORKDIR /app
 
 # Copy supervisor configuration and startup script
 # Note: --chmod=644 is required because:
-#   - The container runs as 'developer' user (non-root)
+#   - The container runs as 'chromium' user (non-root)
 #   - Without explicit chmod, COPY preserves the source file's permissions
 #   - If the source file has 600 permissions, supervisord cannot read it
 #
