@@ -27,8 +27,9 @@
 #   curl http://localhost:9222/json/version
 #
 
-# Debian 12.13 slim variant
-FROM debian:bookworm-20260518-slim
+# Debian 12.13 slim variant. Tag retained for human-readable provenance;
+# multi-arch manifest list digest pins the actual bits we resolve to.
+FROM debian:bookworm-20260518-slim@sha256:0104b334637a5f19aa9c983a91b54c89887c0984081f2068983107a6f6c21eeb
 
 ARG user_name=developer
 ARG user_id
