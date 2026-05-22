@@ -28,14 +28,14 @@
 #
 
 # Debian 12.13 slim variant
-FROM debian:bookworm-20260505-slim
+FROM debian:bookworm-20260518-slim
 
 ARG user_name=developer
 ARG user_id
 ARG group_id
-# https://github.com/uraitakahito/features/releases/tag/1.0.0
+# https://github.com/uraitakahito/features/releases/tag/2.0.1
 ARG features_repository="https://github.com/uraitakahito/features.git"
-ARG features_commit="e8d887d2e17e79f5289b0e8a087dd0730dcad24e"
+ARG features_commit="9f7e672e27207f374d56e5da7f862b0b5b110b3f"
 
 # Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND=noninteractive
@@ -67,7 +67,7 @@ RUN cd /usr/src && \
 # Add user and install common utils.
 #
 # For the list of installed packages, see:
-#   https://github.com/uraitakahito/features/blob/deb6cf416fda206b99c7b771e9caa12e6952f9c7/src/common-utils/main.sh#L35-L78
+#   https://github.com/uraitakahito/features/blob/9f7e672e27207f374d56e5da7f862b0b5b110b3f/src/common-utils/main.sh#L35-L79
 #
 RUN USERNAME=${user_name} \
     USERUID=${user_id} \

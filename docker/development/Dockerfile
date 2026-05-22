@@ -67,20 +67,20 @@
 #
 
 # Debian 12.13
-FROM debian:bookworm-20260505
+FROM debian:bookworm-20260518
 
 ARG user_name=developer
 ARG user_id
 ARG group_id
-# https://github.com/uraitakahito/dotfiles/releases/tag/1.1.4
+# https://github.com/uraitakahito/dotfiles/releases/tag/1.1.9
 ARG dotfiles_repository="https://github.com/uraitakahito/dotfiles.git"
-ARG dotfiles_commit="622bb525a8a46275871bfdc7cf2826c1c489021a"
-# https://github.com/uraitakahito/features/releases/tag/1.0.0
+ARG dotfiles_commit="89501545e6d91811f549d031f65244cd7e0df87a"
+# https://github.com/uraitakahito/features/releases/tag/2.0.1
 ARG features_repository="https://github.com/uraitakahito/features.git"
-ARG features_commit="e8d887d2e17e79f5289b0e8a087dd0730dcad24e"
-# https://github.com/uraitakahito/extra-utils/releases/tag/1.1.0
+ARG features_commit="9f7e672e27207f374d56e5da7f862b0b5b110b3f"
+# https://github.com/uraitakahito/extra-utils/releases/tag/1.3.0
 ARG extra_utils_repository="https://github.com/uraitakahito/extra-utils.git"
-ARG extra_utils_commit="2c5b1ab72c7b98b2a9c42c084aa6b67cdaa36625"
+ARG extra_utils_commit="f975dbcb18f44b518cc181cedad57fd790d9894a"
 
 # Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND=noninteractive
@@ -112,7 +112,7 @@ RUN cd /usr/src && \
 # Add user and install common utils.
 #
 # For the list of installed packages, see:
-#   https://github.com/uraitakahito/features/blob/deb6cf416fda206b99c7b771e9caa12e6952f9c7/src/common-utils/main.sh#L35-L78
+#   https://github.com/uraitakahito/features/blob/9f7e672e27207f374d56e5da7f862b0b5b110b3f/src/common-utils/main.sh#L35-L79
 #
 RUN USERNAME=${user_name} \
     USERUID=${user_id} \
@@ -121,7 +121,7 @@ RUN USERNAME=${user_name} \
     UPGRADEPACKAGES=false \
     # When using ssh-agent inside Docker, add the user to the root group
     # to ensure permission to access the mounted socket.
-    #   https://github.com/uraitakahito/features/blob/59e8acea74ff0accd5c2c6f98ede1191a9e3b2aa/src/common-utils/main.sh#L467-L471
+    #   https://github.com/uraitakahito/features/blob/9f7e672e27207f374d56e5da7f862b0b5b110b3f/src/common-utils/main.sh#L490-L495
     ADDUSERTOROOTGROUP=true \
         /usr/src/features/src/common-utils/install.sh
 
