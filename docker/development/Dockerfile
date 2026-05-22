@@ -78,9 +78,9 @@ ARG dotfiles_commit="622bb525a8a46275871bfdc7cf2826c1c489021a"
 # https://github.com/uraitakahito/features/releases/tag/2.0.1
 ARG features_repository="https://github.com/uraitakahito/features.git"
 ARG features_commit="9f7e672e27207f374d56e5da7f862b0b5b110b3f"
-# https://github.com/uraitakahito/extra-utils/releases/tag/1.1.0
+# https://github.com/uraitakahito/extra-utils/releases/tag/1.3.0
 ARG extra_utils_repository="https://github.com/uraitakahito/extra-utils.git"
-ARG extra_utils_commit="2c5b1ab72c7b98b2a9c42c084aa6b67cdaa36625"
+ARG extra_utils_commit="f975dbcb18f44b518cc181cedad57fd790d9894a"
 
 # Avoid warnings by switching to noninteractive for the build process
 ENV DEBIAN_FRONTEND=noninteractive
